@@ -4,69 +4,76 @@ import { useGame } from '../context/GameContext';
 import { ArrowLeft, Play, Lock, CheckCircle } from 'lucide-react';
 
 const LevelSelect = ({ onBack, onPlayLevel }) => {
-  const { maxUnlockedLevel } = useGame();
+  const { unlockedLevels } = useGame(); // Utilise bien unlockedLevels (Array)
+
+  const containerStyle = {
+    height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column',
+    backgroundColor: '#020617', color: 'white', fontFamily: 'monospace', overflow: 'hidden'
+  };
+
+  const headerStyle = {
+    padding: '20px 40px', display: 'flex', alignItems: 'center',
+    background: '#0f172a', borderBottom: '1px solid #1e293b', boxShadow: '0 4px 10px rgba(0,0,0,0.3)'
+  };
+
+  const scrollContainerStyle = {
+    flex: 1, display: 'flex', gap: '40px', padding: '40px',
+    overflowX: 'auto', alignItems: 'center'
+  };
 
   return (
-    <div className="h-screen w-screen bg-slate-950 flex flex-col font-sans overflow-hidden">
-      
+    <div style={containerStyle}>
       {/* HEADER */}
-      <div className="flex-none p-6 flex items-center bg-slate-900 border-b border-slate-800 z-10 shadow-md">
-        <button onClick={onBack} className="p-3 bg-slate-800 rounded-full text-slate-400 hover:text-white border border-slate-700 transition-colors">
+      <div style={headerStyle}>
+        <button onClick={onBack} style={{ background: '#1e293b', border: '1px solid #475569', color: 'white', padding: '10px', borderRadius: '50%', cursor: 'pointer', marginRight: '20px' }}>
           <ArrowLeft size={24} />
         </button>
-        <h1 className="ml-6 text-3xl font-black text-white uppercase italic tracking-tighter">
-          SÉLECTION <span className="text-cyan-400">NIVEAU</span>
+        <h1 style={{ fontSize: '2rem', fontStyle: 'italic', fontWeight: '900' }}>
+          SÉLECTION <span style={{ color: '#22d3ee' }}>NIVEAU</span>
         </h1>
       </div>
 
-      {/* ZONE DE DÉFILEMENT HORIZONTAL (FORCÉE) */}
-      <div 
-        className="flex-grow w-full bg-slate-950 overflow-x-auto overflow-y-hidden p-8 scrollbar-thin scrollbar-thumb-cyan-900"
-        style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '2rem' }}
-      >
-        
+      {/* CARDS */}
+      <div style={scrollContainerStyle}>
         {LEVELS.map((level) => {
-          const isLocked = level.id > maxUnlockedLevel;
+          const isLocked = !unlockedLevels.includes(level.id);
           
           return (
             <div 
               key={level.id}
-              // min-width est CRUCIAL ici pour empêcher l'écrasement
-              style={{ minWidth: '400px' }}
-              className={`
-                h-[500px] relative rounded-3xl p-8 border-2 flex flex-col justify-between transition-all duration-300 snap-center
-                ${isLocked 
-                  ? 'bg-slate-900/40 border-slate-800 opacity-50 grayscale' 
-                  : 'bg-slate-900 border-cyan-500/30 hover:border-cyan-400 hover:scale-105 hover:shadow-[0_0_50px_rgba(34,211,238,0.15)]'
-                }
-              `}
+              style={{
+                minWidth: '350px', height: '450px', 
+                background: isLocked ? '#0f172a' : 'linear-gradient(145deg, #0f172a, #1e293b)',
+                borderRadius: '20px', padding: '30px',
+                border: isLocked ? '1px solid #334155' : '2px solid #22d3ee',
+                display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+                opacity: isLocked ? 0.6 : 1,
+                boxShadow: isLocked ? 'none' : '0 0 20px rgba(34, 211, 238, 0.2)',
+                position: 'relative'
+              }}
             >
               <div>
-                <div className="flex justify-between items-start mb-6">
-                  <span className="px-4 py-1 rounded-full bg-slate-950 text-cyan-400 text-xs font-bold tracking-widest border border-cyan-900/50">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                  <span style={{ padding: '5px 10px', background: '#020617', color: '#22d3ee', borderRadius: '15px', fontSize: '10px', fontWeight: 'bold', border: '1px solid #1e293b' }}>
                     NIVEAU {level.id}
                   </span>
-                  {level.id < maxUnlockedLevel && <CheckCircle className="text-green-500" size={28} />}
-                  {isLocked && <Lock className="text-slate-600" size={28} />}
+                  {!isLocked && <CheckCircle size={24} color="#22c55e" />}
+                  {isLocked && <Lock size={24} color="#64748b" />}
                 </div>
 
-                <h3 className="text-4xl font-black text-white mb-3 italic tracking-tight">
-                  {level.title}
-                </h3>
-                
-                <p className="text-slate-400 text-base leading-relaxed h-24 overflow-hidden">
-                  {level.description}
-                </p>
+                <h3 style={{ fontSize: '2rem', fontWeight: '900', fontStyle: 'italic', marginBottom: '10px' }}>{level.title}</h3>
+                <p style={{ color: '#94a3b8', fontSize: '0.9rem', lineHeight: '1.5', height: '60px', overflow: 'hidden' }}>{level.description}</p>
 
-                {/* Stats */}
-                <div className="bg-slate-950/80 rounded-2xl p-6 border border-slate-800 grid grid-cols-2 gap-4">
-                   <div className="text-center">
-                      <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Distance</div>
-                      <div className="text-2xl font-mono font-bold text-white">{level.distance}m</div>
+                {/* Info Box */}
+                <div style={{ marginTop: '20px', background: '#020617', borderRadius: '10px', padding: '15px', display: 'flex', justifyContent: 'space-between', border: '1px solid #1e293b' }}>
+                   <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '9px', color: '#64748b', fontWeight: 'bold' }}>DISTANCE</div>
+                      <div style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{level.distance}m</div>
                    </div>
-                   <div className="text-center border-l border-slate-800">
-                      <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Danger</div>
-                      <div className="text-2xl font-mono font-bold text-red-400">{level.obstacles?.length || 0}</div>
+                   <div style={{ width: '1px', background: '#334155' }}></div>
+                   <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '9px', color: '#64748b', fontWeight: 'bold' }}>DANGER</div>
+                      <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#ef4444' }}>{level.obstacles?.length || 0}</div>
                    </div>
                 </div>
               </div>
@@ -74,21 +81,21 @@ const LevelSelect = ({ onBack, onPlayLevel }) => {
               <button 
                 onClick={() => !isLocked && onPlayLevel(level)}
                 disabled={isLocked}
-                className={`
-                  w-full py-5 font-bold rounded-xl flex items-center justify-center gap-3 transition-all text-lg
-                  ${isLocked 
-                    ? 'bg-slate-800 text-slate-500 cursor-not-allowed' 
-                    : 'bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-xl shadow-cyan-900/20'
-                  }
-                `}
+                style={{
+                  width: '100%', padding: '15px', borderRadius: '10px', border: 'none',
+                  background: isLocked ? '#334155' : 'linear-gradient(90deg, #0891b2, #2563eb)',
+                  color: isLocked ? '#94a3b8' : 'white',
+                  fontWeight: 'bold', fontSize: '1rem', cursor: isLocked ? 'not-allowed' : 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px'
+                }}
               >
-                {isLocked ? 'VERROUILLÉ' : <><Play size={24} fill="currentColor" /> DÉMARRER</>}
+                {isLocked ? 'VERROUILLÉ' : <><Play size={20} fill="currentColor"/> DÉMARRER</>}
               </button>
             </div>
           );
         })}
-
-        {/* Espace vide fin */}
+        
+        {/* Padding fin */}
         <div style={{ minWidth: '50px' }}></div>
       </div>
     </div>
